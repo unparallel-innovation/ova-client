@@ -10,20 +10,24 @@ from pygments import formatters, highlight, lexers
 from config import config
 from validators import validate_image
 from visualize import visualize_image_predictions
+from PIL import Image
+import urllib.request
+from urllib.parse import urlparse
+
+def is_url(url):
+  try:
+    result = urlparse(url)
+    return all([result.scheme, result.netloc])
+  except ValueError:
+    return False
 
 
-@click.group()
-def cli():
-    pass
 
-
-@cli.command()
-@click.option("-s", "--save", flag_value=True, help="Save the output image.")
-@click.option(
-    "-v", "--visualize", flag_value=True, help="Draw bounding boxes on the detected objects."
-)
-@click.argument("image", type=click.Path(exists=True))
 def detection(image, save, visualize):
+    if (is_url(image)):
+        urllib.request.urlretrieve(image,"result.jpg")
+        img = Image.open("result.jpg")
+        image = "result.jpg"
 
     mimetype = validate_image(image)
 
@@ -44,6 +48,15 @@ def detection(image, save, visualize):
         print(highlight(output, lexers.JsonLexer(), formatters.TerminalFormatter()))
         return
 
+    result_dir = config.RESULT_DIR
+    Path(result_dir).mkdir(parents=True, exist_ok=True)
+    path = Path(f"{result_dir}/predictions.json")
+
+
+    with open(path, 'w') as outfile:
+        json.dump(predictions, outfile)
+    outfile.close()
+
     img = visualize_image_predictions(image, predictions)
 
     if save:
@@ -53,7 +66,3 @@ def detection(image, save, visualize):
         img.save(path)
     else:
         img.show()
-
-
-if __name__ == "__main__":
-    cli()

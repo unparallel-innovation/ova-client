@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<header>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+</header>
+<head>
+    <meta charset="UTF-8">
+    <title>Choose your camera number</title>
+    <style>
+    /* Chrome, Safari, Edge, Opera */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    /* Firefox */
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+    .center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      margin-top: 100px;
+    }
+    h1.h1config {
+      text-align: center;
+      font-family: arial, sans-serif;
+    }
+    .centertitle{
+      text-align: center;
+      font-family: arial, sans-serif;
+      color: #999999;
+    }
+    .buttonsubmit {
+      background-color: #446ab1;
+      border: none;
+      color: white;
+      padding: 5px 15px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 14px;
+      margin-top: 19px;
+      margin-bottom: 19px;
+      }
+
+      .successMessage {
+        background-color: #55bcbb;
+        border: none;
+        font-family: arial, sans-serif;
+
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 14px;
+        line-height:29px;
+        }
+
+    .input{
+      width: 350px;
+      height: 25px;
+    }
+    .centerdiv{
+      display: flex;
+      justify-content: center;
+    }
+
+    /* Style the tab */
+    .tab {
+      overflow: hidden;
+      border: 1px solid #ccc;
+      background-color: #f1f1f1;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* Style the buttons that are used to open the tab content */
+    .tab button {
+      background-color: inherit;
+      float: left;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      padding: 14px 16px;
+      transition: 0.3s;
+    }
+
+    /* Change background color of buttons on hover */
+    .tab button:hover {
+      background-color: #ddd;
+    }
+
+    /* Create an active/current tablink class */
+    .tab button.active {
+      background-color: #ccc;
+    }
+
+    /* Style the tab content */
+    .tabcontent {
+      display: none;
+      padding: 6px 12px;
+      border: 1px solid #ccc;
+      border-top: none;
+    }
+
+  </style>
+</head>
+<body>
+
+<h1 class="h1config">Choose your image source</h1>
+<div class="tab">
+  <button class="tablinks" onclick="openEvent(event, 'Finland')" id="defaultOpen">Finland</button>
+  <button class="tablinks" onclick="openEvent(event, 'Australia')">Australia</button>
+  <button class="tablinks" onclick="openEvent(event, 'custom_url')">User Url</button>
+</div>
+
+<div id="Finland" class="tabcontent">
+
+<form class="wrapper" onsubmit="return false;">
+  <h3 class="centertitle">Choose your camera number (0-771)</h3>
+    <h5 class="centertitle">This information was provide by https://tie.digitraffic.fi/api/v1/data/camera-data</h4>
+
+    <div class="centertitle"><input class="input" id="url_image_fin" type="number" name="url_image" min="0" max="771" value="" required></div>
+    <div class="centertitle"><input id="buttonfinland" class="buttonsubmit" type="submit" value="Submit"></div>
+</form>
+<div class="centerdiv">
+<div id="loading_fin" style="display: none"><img src="/static/ajax-loader.gif" alt="" /></div>
+<div id="msg_fin" style="text-align:center" class="successMessage"> {{success}} </div>
+</div>
+
+</div>
+
+<div id="Australia" class="tabcontent">
+
+<form class="wrapper" onsubmit="return false;">
+  <h3 class="centertitle">Choose your camera number (0-134)</h3>
+<h5 class="centertitle">This information was provide by https://api.transport.nsw.gov.au/v1/live/cameras</h4>
+    <div class="centertitle"><input class="input" id="url_image_au" type="number" name="url_image" min="0" max="134" value="" required></div>
+    <div class="centertitle"><input id="buttonaustralia" class="buttonsubmit" type="submit" value="Submit"></div>
+</form>
+<div class="centerdiv">
+<div id="loading_au" style="display: none"><img src="/static/ajax-loader.gif" alt="" /></div>
+<div id="msg_au" style="text-align:center" class="successMessage"> {{success}} </div>
+</div>
+
+</div>
+
+
+<div id="custom_url" class="tabcontent">
+
+<form class="wrapper" onsubmit="return false;">
+  <h3 class="centertitle">Choose your url image</h3>
+<h5 class="centertitle">Only use images which you are free to use.</h4>
+    <div class="centertitle"><input class="input" id="url_image_custom" type="text" name="url_image" value="" required></div>
+    <div class="centertitle"><input id="buttoncustom" class="buttonsubmit" type="submit" value="Submit"></div>
+</form>
+<div class="centerdiv">
+<div id="loading_custom" style="display: none"><img src="/static/ajax-loader.gif" alt="" /></div>
+<div id="msg_custom" style="text-align:center" class="successMessage"> {{success}} </div>
+</div>
+
+</div>
+
+
+
+</body>
+<script>
+   $(document).ready(function(){
+
+     $('.wrapper').on('click', '#buttonfinland', function(){
+       console.log("fin")
+       $('#loading_fin').show()
+       $('#msg_fin').hide()
+        var url_image_fin = $("#url_image_fin").val();
+        $.ajax({
+         url: "/get_finland",
+         type: "get",
+         data: {url_image: url_image_fin },
+         success: function(response) {
+           $('#loading_fin').hide()
+           $('#msg_fin').show()
+           $("#msg_fin").html('<p>'+response.result.toString()+'</p>');
+         },
+         error: function(response) {
+           $('#loading_fin').hide()
+           $("#msg_fin").html('<p>'+response.result.toString()+'</p>');
+         }
+        });
+     });
+   });
+
+   $(document).ready(function(){
+
+     $('.wrapper').on('click', '#buttonaustralia', function(){
+       console.log("aus")
+       console.log(url_image_au)
+       $('#loading_au').show()
+       $('#msg_au').hide()
+        var url_image_au = $("#url_image_au").val();
+        $.ajax({
+         url: "/get_australia",
+         type: "get",
+         data: {url_image: url_image_au },
+         success: function(response) {
+           $('#loading_au').hide()
+           $('#msg_au').show()
+           $("#msg_au").html('<p>'+response.result.toString()+'</p>');
+         },
+         error: function(response) {
+           $('#loading_au').hide()
+           $("#msg_au").html('<p>'+response.result.toString()+'</p>');
+         }
+        });
+     });
+   });
+
+   $(document).ready(function(){
+
+     $('.wrapper').on('click', '#buttoncustom', function(){
+       console.log("custom")
+       console.log(url_image_custom)
+       $('#loading_custom').show()
+       $('#msg_custom').hide()
+        var url_image_custom = $("#url_image_custom").val();
+        $.ajax({
+         url: "/get_url_custom",
+         type: "get",
+         data: {url_image: url_image_custom },
+         success: function(response) {
+           $('#loading_custom').hide()
+           $('#msg_custom').show()
+           $("#msg_custom").html('<p>'+response.result.toString()+'</p>');
+         },
+         error: function(response) {
+           $('#loading_custom').hide()
+           $("#msg_custom").html('<p>'+response.result.toString()+'</p>');
+         }
+        });
+     });
+   });
+
+   function openEvent(evt, cityName) {
+  // Declare all variables
+  var i, tabcontent, tablinks;
+
+  // Get all elements with class="tabcontent" and hide them
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+
+  // Get all elements with class="tablinks" and remove the class "active"
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+
+  // Show the current tab, and add an "active" class to the button that opened the tab
+  document.getElementById(cityName).style.display = "block";
+  evt.currentTarget.className += " active";
+}
+
+
+document.getElementById("defaultOpen").click();
+</script>
+</html>
