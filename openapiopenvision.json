@@ -1,0 +1,114 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Open Vision API",
+    "description": "Open source computer vision API based on open source models.",
+    "version": "Latest"
+  },
+  "servers": [
+    {
+      "url": "https://api.openvisionapi.com",
+      "description": "Main production server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "OpenVisionAPI",
+      "externalDocs": {
+        "description": "Find out more",
+        "url": "https://api.openvisionapi.com"
+      }
+    }
+  ],
+  "paths": {
+    "/api/v1/detection": {
+      "post": {
+        "tags": [
+          "OpenVisionAPI"
+        ],
+        "summary": "OpenvisionAPI.",
+        "description": "This endpoint will analyse an image and provide the detected objects.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "model": {
+                    "type": "string",
+                    "example": "yolov4"
+                  },
+                  "image": {
+                    "type": "object",
+                    "example": "@images/cat.jpeg"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "A JSON array of predictions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "integer",
+                      "format": "int64",
+                      "example": "Detected objects"
+                    },
+                    "predictions": {
+                      "type": "string",
+                      "example": {
+                        "bbox": {
+                          "x1": 442,
+                          "x2": 982,
+                          "y1": 199,
+                          "y2": 1270
+                        },
+                        "label": "cat",
+                        "score": "0.93"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error in receiving image",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "type": "string",
+                      "example": "Unprocessable entity"
+                    },
+                    "content": {
+                      "type": "string",
+                      "example": {
+                        "message": {
+                          "form": {
+                            "model": [
+                              "Missing data for required field."
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
