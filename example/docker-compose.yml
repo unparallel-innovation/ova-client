@@ -1,0 +1,15 @@
+version: '3.1'
+
+services:
+  serverWithVision:
+    image: docker-hub.unparallel-server-1.ddns.net/smartclide/demo2:0.3
+    ports:
+      - "5000:5000"
+    environment:
+      - api=OsZa34jVeNcAJs0M0q3u1Q6wghK718wsww5f
+      - ova-server=http://ova-server:8000
+    
+  ova-server:
+    image: docker-hub.unparallel-server-1.ddns.net/smartclide/ova-server:0.1
+    ports:
+      - "8300:8000"

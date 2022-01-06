@@ -7,6 +7,7 @@ import sys
 import getCamerasFinland
 import getCamerasAustralia
 import time
+from config import config
 
 PEOPLE_FOLDER = os.path.join('static')
 
@@ -61,17 +62,10 @@ def startwithurl():
 def get_finland():
 
     try:
-        url=""
-        if(len(sys.argv)>1):
-            url = "http://localhost:5000/startwithurl?url=" +getCamerasFinland.getCameras()[int(request.args.get('url_image'))]
-        else:
-
-            url = "http://serverWithVision:5000/startwithurl?url=" +getCamerasFinland.getCameras()[int(request.args.get('url_image'))]
+        url = config.URL_VISION+getCamerasFinland.getCameras()[int(request.args.get('url_image'))]
         payload = ""
         headers = {}
-
         response = requests.request("post", url, headers=headers, data=payload)
-        print(response)
         return jsonify({"result":"The image was succefully changed"})
     except Exception as e:
         print(e)
@@ -80,14 +74,8 @@ def get_finland():
 
 @app.route('/get_australia',methods=["GET","POST"])
 def get_australia():
-    print(request.args.get('url_image'))
     try:
-        url=""
-        if(len(sys.argv)>1):
-            url = "http://localhost:5000/startwithurl?url=" +getCamerasAustralia.getCameras()[int(request.args.get('url_image'))]
-        else:
-
-            url = "http://serverWithVision:5000/startwithurl?url=" +getCamerasAustralia.getCameras()[int(request.args.get('url_image'))]
+        url = config.URL_VISION + +getCamerasAustralia.getCameras()[int(request.args.get('url_image'))]
         payload = ""
         headers = {}
 
