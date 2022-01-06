@@ -1,9 +1,12 @@
 In this repository it will be available a way to analyse an image and then identify the objects in there using the [OpenVisionAPI](https://openvisionapi.com). After that analyses it will be available multiple URL endpoint allowing the user to view stats, view an image with the objects identified in top the original image and choose another image to analysis from 3 different sources. <br>
 To have a real traffic image we resort to some API already on the internet like [this from Australia](https://opendata.transport.nsw.gov.au/node/340/exploreapi) and [this from Finlandia](https://www.digitraffic.fi/en/road-traffic/#swagger-api-descriptions). It was developed a script to collect all the url images that various API sends. Then it will be necessary to choose the camera that user want to use, because the APIs has multiple cameras across all Australia and Finlandia.<br>
-In this example we are using an existing OpenVisionAPI server, which can be consulted [here](https://github.com/openvisionapi/ova-server) the code open source. It is also needed a OpenVisionAPI client, which is already included in this repository, available [here](https://github.com/openvisionapi/ova-client), which will send the image pretending to be analysed to the server mentioned.<br>
+
+
 It was used a webserver to facilitate the interactions and this webserver was based on [Flask](https://flask.palletsprojects.com/en/2.0.x/). Flask is a lightweight WSGI web application framework. It is designed to make getting started quick and easy, with the ability to scale up to complex applications. It began as a simple wrapper around Werkzeug and Jinja and has become one of the most popular Python web application frameworks.
 Flask offers suggestions, but doesn't enforce any dependencies or project layout. It is up to the developer to choose the tools and libraries they want to use. There are many extensions provided by the community that make adding new functionality easy.<br>
 
+
+We have an example, inside example folder, where you are able to create your own OpenVisionAPI server using Dockerfile ([original open source code](https://github.com/openvisionapi/ova-server)). It is also needed a OpenVisionAPI client, which is already included in this repository, available [here](https://github.com/openvisionapi/ova-client), which will send the image pretending to be analysed to the server mentioned. Inside our example folder we have also a docker-compose ready to use with images hosted in docker hub, feel free to try it!<br>
 
 
 ## 🚀 Getting Started
@@ -11,7 +14,8 @@ To use this you need to have previously an api key from https://opendata.transpo
 After having that, you will be able to use this bundle and analyse what kind of objects were detected in the provided image.
 
 
-There are two types of deployment. Standalone, to be run in a machine or through Docker.
+There are two types of deployment. Standalone, to be run in a machine or through Docker.<br>
+*Running this using Docker is the recommended method.*
 
 
 # Standalone
@@ -22,17 +26,24 @@ $ make setup
 ### Usage
 ```
 $ source .venv/bin/activate
-$ python3 webserverWithVisionAPI.py  API_AUSTRALIA
+$ OVASERVER="http://ova-server:8000" python3 webserverWithVisionAPI.py  API_AUSTRALIA
 ```
-
+The OVASERVER environmental variable represents the hostname of the openvisionAPI server, change it accordingly. The ova-server should be already running check this [website](https://github.com/openvisionapi/ova-server) for more winfromation or create a docker image using the information above.
 # DOCKER
 ### Prerequisites
 Build and deploy the image to an external Docker registry (DockerRegistryUrl_OpenVisionAPIWithWebserver). Please update the file according to the desired Docker registry URL.
 
+OpenVisionAPIWithWebserver
 ```
 $ chmod +x buildAndDeploy.sh
 $ ./buildAndDeploy.sh
 ```
+
+Ova-server
+```
+$ cd example/
+```
+using the same logic used at OpenVisionAPIWithWebserver create your own image of the ova-server. 
 
 
 ### USAGE
@@ -47,16 +58,23 @@ services:
       - "5000:5000"
     environment:
       - api=API_IMAGE_AU
+      - OVASERVER=http://ova-server:8000
+    depends_on:
+      - ova-server
+    
+  ova-server:
+    image: DockerRegistryUrl_ovaServer:TAG
+    ports:
+      - "8300:8000
 ```
 
+Run docker images individually and locally
+´´´
+$ docker run -p port_external:port_external  NAME:TAG
+´´´
+### USE OUR EXAMPLE
+We created a working example, inside example folder, using images hosted in the docker hub. You just need to run it with docker-compose up
 
-
-Run it locally
-
-```
-$ docker run -p 5000:5000  NAME
-```
-The NAME should contains the name of the image plus the tag. This details must be set in the buildAndDeploy script.
 
 # Endpoints available
 After running it, in both deploy options you will have several endpoints available:
